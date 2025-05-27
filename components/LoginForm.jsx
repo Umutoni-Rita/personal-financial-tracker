@@ -82,14 +82,8 @@ export default function LoginForm({ navigation }) {
           accessibilityLabel="Password input"
         />
       </View>
-      <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} style={styles.forgotPassword}>
-        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-      </TouchableOpacity>
       <TouchableOpacity onPress={handleLogin} style={styles.button} activeOpacity={0.8}>
         <Text style={styles.buttonText}>Log In</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
-        <Text style={styles.signUpText}>Don't have an account? Sign Up</Text>
       </TouchableOpacity>
     </View>
   );
