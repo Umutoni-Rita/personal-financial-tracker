@@ -1,0 +1,115 @@
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f5f7fa',
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#1f2937',
+    marginBottom: 20,
+    fontFamily: 'Roboto',
+  },
+  summaryCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  subtitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1f2937',
+    marginBottom: 10,
+  },
+  summaryAmount: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#f4a261',
+  },
+  budgetContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  budgetInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: '#1f2937',
+    backgroundColor: '#fff',
+  },
+  saveBudgetButton: {
+    backgroundColor: '#2e8b8f',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginLeft: 10,
+  },
+  saveBudgetButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  budgetProgress: {
+    marginTop: 10,
+  },
+  budgetProgressText: {
+    fontSize: 14,
+    color: '#6b7280',
+  },
+  recentExpensesCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  recentExpenseItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#d1d5db',
+  },
+  recentExpenseName: {
+    fontSize: 16,
+    color: '#1f2937',
+  },
+  recentExpenseAmount: {
+    fontSize: 16,
+    color: '#f4a261',
+  },
+  biggestPurchaseText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#f4a261',
+  },
+  biggestPurchaseDescription: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 5,
+  },
+  chartPlaceholder: {
+    fontSize: 16,
+    color: '#6b7280',
+    textAlign: 'center',
+    marginTop: 50,
+  },
+});

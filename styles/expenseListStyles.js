@@ -1,0 +1,116 @@
+import { StyleSheet } from "react-native";
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#f5f7fa',
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#1f2937',
+    marginBottom: 15,
+    fontFamily: 'Roboto',
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a6a6e',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    marginBottom: 15,
+    shadowColor: '#1a6a6e',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 10,
+  },
+  expenseItem: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  expenseContent: {
+    marginBottom: 10,
+  },
+  expenseName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  expenseAmount: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#f4a261',
+  },
+  expenseDescription: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 5,
+  },
+  expenseDate: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 5,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#1a6a6e',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    marginLeft: 10,
+  },
+  deleteButton: {
+    backgroundColor: '#e63946',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 5,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+    marginTop: 50,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#6b7280',
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  emptyButton: {
+    backgroundColor: '#2e8b8f',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginTop: 15,
+  },
+  emptyButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
