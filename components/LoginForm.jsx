@@ -52,7 +52,7 @@ export default function LoginForm({ navigation }) {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.mainheading}>Personalized Financial Tracker</Text>
+      <Text style={styles.mainheading}>Welcome to FinanceWise</Text>
       <Text style={styles.heading}>Log In</Text>
       <View style={styles.inputContainer}>
         <Ionicons name="mail-outline" size={20} color={focusedInput === 'username' ? '#2e8b8f' : '#6b7280'} style={styles.icon} />

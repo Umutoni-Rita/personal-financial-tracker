@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { SafeAreaView } from 'react-native';
+import * as Notifications from 'expo-notifications'; // Import Notifications
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import LoginScreen from './screens/LoginScreen';
@@ -13,6 +15,15 @@ import { UserProvider } from './context/UserContext';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
+
+// Configure notification handler
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 const TabNavigator = () => {
   return (
@@ -30,9 +41,12 @@ const TabNavigator = () => {
         tabBarStyle: {
           backgroundColor: '#fff',
           borderTopColor: '#d1d5db',
-          paddingBottom: 5,
-          paddingTop: 5,
-        },
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
+        }
       })}
     >
       <Tab.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false }} />
@@ -59,18 +73,28 @@ const App = () => {
     checkUser();
   }, []);
 
+  // Set up notification listener
+  useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Notification received:', notification);
+    });
+    return () => subscription.remove();
+  }, []);
+
   return (
     <UserProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName={initialRoute}
-          screenOptions={{ headerShown: false }}
-        >
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Main" component={TabNavigator} />
-          <Stack.Screen name="AddExpense" component={AddExpenseScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#e5e7eb' }}>
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName={initialRoute}
+            screenOptions={{ headerShown: false }}
+          >
+            <Stack.Screen name="Login" component={LoginScreen} />
+            <Stack.Screen name="Main" component={TabNavigator} />
+            <Stack.Screen name="AddExpense" component={AddExpenseScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </SafeAreaView>
     </UserProvider>
   );
 };

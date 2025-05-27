@@ -97,7 +97,7 @@ const AddExpenseScreen = ({ navigation }) => {
       >
         <Text style={styles.buttonText}>{isLoading ? 'Adding...' : 'Add Expense'}</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.navigate('Expenses')}>
+      <TouchableOpacity style={styles.cancelButton} onPress={() =>navigation.navigate('Main', { screen: 'Expenses'})}>
         <Text style={styles.cancelButtonText}>Cancel</Text>
       </TouchableOpacity>
     </View>

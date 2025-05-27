@@ -1,24 +1,48 @@
-// Dashboard.js
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, FlatList } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, Modal } from 'react-native';
+import * as Notifications from 'expo-notifications'; // Import Expo Notifications
 import { getExpenses } from '../service/expenseService';
 import { UserContext } from '../context/UserContext';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { styles } from '../styles/dashboardStyles';
 
+// Configure notification handler
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
 const Dashboard = ({ navigation }) => {
   const [totalSpending, setTotalSpending] = useState(0);
   const [budget, setBudget] = useState('');
-  const [recentExpenses, setRecentExpenses] = useState([]);
-  const [biggestPurchase, setBiggestPurchase] = useState(null);
+  const [mostExpensive, setMostExpensive] = useState(null);
+  const [mostRecent, setMostRecent] = useState(null);
+  const [budgetExceeded, setBudgetExceeded] = useState(false); // Track budget exceedance
+  const [showModal, setShowModal] = useState(false); // Control modal visibility
   const { userId } = useContext(UserContext);
+
+  // Request notification permissions on component mount
+  useEffect(() => {
+    const setupNotifications = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Notifications are required to alert you about budget exceedance.', [{ text: 'OK' }]);
+      }
+    };
+    setupNotifications();
+  }, []);
 
   const fetchData = async () => {
     if (!userId) {
       setTotalSpending(0);
-      setRecentExpenses([]);
-      setBiggestPurchase(null);
+      setMostExpensive(null);
+      setMostRecent(null);
+      setBudgetExceeded(false);
+      setShowModal(false);
       return;
     }
     try {
@@ -37,27 +61,46 @@ const Dashboard = ({ navigation }) => {
       }, 0);
       setTotalSpending(total);
 
-      // Get recent expenses (last 3)
-      const sortedExpenses = userExpenses.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setRecentExpenses(sortedExpenses.slice(0, 3));
-
-      // Find biggest purchase
-      const biggest = userExpenses.reduce((max, exp) => {
+      const expensive = userExpenses.reduce((max, exp) => {
         const amount = Number(exp.amount);
         return amount > Number(max?.amount || 0) ? exp : max;
       }, null);
-      setBiggestPurchase(biggest);
+      setMostExpensive(expensive);
+
+      const recent = userExpenses.reduce((latest, exp) => {
+        return new Date(exp.createdAt) > new Date(latest?.createdAt || 0) ? exp : latest;
+      }, null);
+      setMostRecent(recent);
+
+      // Check if budget is exceeded
+      if (storedBudget && total > Number(storedBudget)) {
+        if (!budgetExceeded) { // Only notify once per exceedance
+          setBudgetExceeded(true);
+          setShowModal(true);
+          // Send push notification
+          await Notifications.scheduleNotificationAsync({
+            content: {
+              title: 'Budget Exceeded!',
+              body: `Your spending ($${total.toFixed(2)}) has exceeded your budget of $${Number(storedBudget).toFixed(2)}. Remember to be financially wise`,
+            },
+            trigger: null, // Immediate notification
+          });
+        }
+      } else {
+        setBudgetExceeded(false);
+        setShowModal(false);
+      }
     } catch (error) {
       Alert.alert('Error', error.message, [{ text: 'OK', style: 'cancel' }]);
     }
   };
 
   useEffect(() => {
-    fetchData(); // Initial fetch
+    fetchData();
     const unsubscribe = navigation.addListener('focus', () => {
-      fetchData(); // Re-fetch when screen is focused
+      fetchData();
     });
-    return unsubscribe; // Cleanup listener on unmount
+    return unsubscribe;
   }, [userId, navigation]);
 
   const handleSaveBudget = async () => {
@@ -68,20 +111,75 @@ const Dashboard = ({ navigation }) => {
     try {
       await AsyncStorage.setItem('budget', budget);
       Alert.alert('Success', 'Budget saved successfully', [{ text: 'OK', style: 'cancel' }]);
+      fetchData(); // Re-check budget after saving
     } catch (error) {
       Alert.alert('Error', 'Failed to save budget', [{ text: 'OK', style: 'cancel' }]);
     }
   };
 
-  const renderRecentExpense = ({ item }) => (
-    <View style={styles.recentExpenseItem}>
-      <Text style={styles.recentExpenseName}>{item.name}</Text>
-      <Text style={styles.recentExpenseAmount}>${Number(item.amount).toFixed(2)}</Text>
-    </View>
-  );
+  const handleAcknowledgeBudgetWarning = () => {
+    setShowModal(false); // Close modal but allow continued use
+  };
 
   return (
     <View style={styles.container}>
+      {/* Budget Exceedance Modal */}
+      <Modal
+        visible={showModal}
+        transparent={true}
+        animationType="fade"
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <View style={{
+            backgroundColor: '#fff',
+            padding: 20,
+            borderRadius: 12,
+            width: '80%',
+            alignItems: 'center',
+          }}>
+            <Text style={{
+              fontSize: 20,
+              fontWeight: '700',
+              color: '#e63946',
+              marginBottom: 10,
+            }}>
+              Budget Exceeded!
+            </Text>
+            <Text style={{
+              fontSize: 16,
+              color: '#1f2937',
+              textAlign: 'center',
+              marginBottom: 20,
+            }}>
+              Your spending (${totalSpending.toFixed(2)}) has exceeded your budget of ${Number(budget).toFixed(2)}.
+            </Text>
+            <TouchableOpacity
+              style={{
+                backgroundColor: '#2e8b8f',
+                paddingVertical: 10,
+                paddingHorizontal: 20,
+                borderRadius: 10,
+              }}
+              onPress={handleAcknowledgeBudgetWarning}
+            >
+              <Text style={{
+                color: '#fff',
+                fontSize: 16,
+                fontWeight: '600',
+              }}>
+                I will spend wisely
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Existing Dashboard Content */}
       <Text style={styles.title}>Financial Dashboard</Text>
       <View style={styles.summaryCard}>
         <Text style={styles.subtitle}>Total Spending</Text>
@@ -108,26 +206,26 @@ const Dashboard = ({ navigation }) => {
           </View>
         )}
       </View>
-      {biggestPurchase && (
+      {mostExpensive && (
         <View style={styles.summaryCard}>
-          <Text style={styles.subtitle}>Biggest Purchase</Text>
+          <Text style={styles.subtitle}>Most Expensive</Text>
           <Text style={styles.biggestPurchaseText}>
-            {biggestPurchase.name}: ${Number(biggestPurchase.amount).toFixed(2)}
+            {mostExpensive.name}: ${Number(mostExpensive.amount).toFixed(2)}
           </Text>
           <Text style={styles.biggestPurchaseDescription}>
-            {biggestPurchase.description || 'No description'}
+            {mostExpensive.description || 'No description'}
           </Text>
         </View>
       )}
-      {recentExpenses.length > 0 && (
-        <View style={styles.recentExpensesCard}>
-          <Text style={styles.subtitle}>Recent Expenses</Text>
-          <FlatList
-            data={recentExpenses}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={renderRecentExpense}
-            scrollEnabled={false}
-          />
+      {mostRecent && (
+        <View style={styles.summaryCard}>
+          <Text style={styles.subtitle}>Most Recent</Text>
+          <Text style={styles.biggestPurchaseText}>
+            {mostRecent.name}: ${Number(mostRecent.amount).toFixed(2)}
+          </Text>
+          <Text style={styles.biggestPurchaseDescription}>
+            {mostRecent.description || 'No description'} (Date: {new Date(mostRecent.createdAt).toLocaleDateString()})
+          </Text>
         </View>
       )}
     </View>
